@@ -37,6 +37,7 @@ const Record = (props) => (
 
 export default function RecordList() {
   const [records, setRecords] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // This method fetches the records from the database.
   useEffect(() => {
@@ -65,21 +66,32 @@ export default function RecordList() {
 
   // This method will map out the records on the table
   function recordList() {
-    return records.map((record) => {
-      return (
+    return records
+      .filter((record) =>
+        `${record.name} ${record.position} ${record.level}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      )
+      .map((record) => (
         <Record
           record={record}
           deleteRecord={() => deleteRecord(record._id)}
           key={record._id}
         />
-      );
-    });
+      ));
   }
 
   // This following section will display the table with the records of individuals.
   return (
     <>
-      <h3 className="text-lg font-semibold p-4">Employee Records</h3>
+      <h3>Employee Records</h3>
+      <input
+        type="text"
+        placeholder="Search employees..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-4 p-2 border rounded w-full"
+      />
       <div className="border rounded-lg overflow-hidden">
         <div className="relative w-full overflow-auto">
           <table className="w-full caption-bottom text-sm">
