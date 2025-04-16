@@ -81,11 +81,16 @@ export default function RecordList() {
         .filter((record) => {
           // Combine the record's name, position, and level into a single string
           const recordString = `${record.name} ${record.position} ${record.level}`;
+          const recordNameString = `${record.name}`;
           const searchMatch = recordString
             .toLowerCase()
             .includes(searchTerm.toLowerCase());
           const levelFilterMatch =
             levelFilter === "" || record.level === levelFilter;
+
+          const searchNameMatch = recordNameString
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
 
           if (!levelFilterMatch) {
             return false;
