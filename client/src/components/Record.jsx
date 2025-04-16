@@ -44,25 +44,40 @@ export default function Record() {
     return setForm((prev) => ({ ...prev, ...value }));
   }
 
+  /**
+   * Validates the form.
+   * @returns {boolean} true if the form is valid, false otherwise.
+   */
   const validationForm = () => {
     const errors = {};
+    // Check if each field is not empty
     if (!form.name.trim()) errors.name = "Name is required.";
     if (!form.position.trim()) errors.position = "Position is required.";
     if (!form.level.trim()) errors.level = "Level is required.";
-
+    // Set the form errors state
     setFormErrors(errors);
+    // Return true if there are no errors, false otherwise
     return Object.keys(errors).length === 0;
   };
 
   // This function will handle the submission.
+  /**
+   * Handles the submission of the form.
+   * @param {Event} e the form submission event
+   */
   async function onSubmit(e) {
     e.preventDefault();
 
+    // Check if the form is valid
     if (!validationForm()) return;
 
+    // Create a copy of the form's state
     const person = { ...form };
+
+    // Check for errors (again)
     const errors = validationForm();
     if (Object.keys(errors).length > 0) {
+      // If there are errors, set the form errors state
       setFormErrors(errors);
       return;
     }
@@ -132,29 +147,28 @@ export default function Record() {
               </label>
               <div className="mt-2">
                 <div
-                  className={`flex rounded-md shadow-sm ring-1 ring-inset ${
+                  className={`flex items-center rounded-md ring-1 ring-inset ${
                     formErrors.name ? "ring-2 ring-red-500" : "ring-slate-300"
-                  } focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md`}
+                  } focus-within:ring-2 focus-within:ring-indigo-600 transition-all`}
                 >
-                  {/* TODO: fix indigo focus ring to be around the wrapper and not the input */}
-
                   <input
                     type="text"
                     name="name"
                     id="name"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
                     placeholder="First Last"
                     value={form.name}
                     onChange={(e) => updateForm({ name: e.target.value })}
+                    className="w-full border-none bg-transparent px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:outline-none text-sm"
                   />
-                  {formErrors.name && (
-                    <p className="text-red-500 text-sm mt-1">
-                      {formErrors.name}
-                    </p>
-                  )}
                 </div>
+
+                {/* Validation Message */}
+                {formErrors.name && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                )}
               </div>
             </div>
+
             <div className="sm:col-span-4">
               <label
                 htmlFor="position"
@@ -163,71 +177,65 @@ export default function Record() {
                 Position
               </label>
               <div className="mt-2">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                <div
+                  className={`flex items-center rounded-md ring-1 ring-inset ${
+                    formErrors.position
+                      ? "ring-2 ring-red-500"
+                      : "ring-slate-300"
+                  } focus-within:ring-2 focus-within:ring-indigo-600 transition-all`}
+                >
                   <input
                     type="text"
                     name="position"
                     id="position"
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-slate-900 placeholder:text-slate-400 focus:ring-0 sm:text-sm sm:leading-6"
-                    placeholder="Developer Advocate"
+                    placeholder="Developer, Designer, Manager ..."
                     value={form.position}
                     onChange={(e) => updateForm({ position: e.target.value })}
+                    className="w-full border-none bg-transparent px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:outline-none text-sm"
                   />
                 </div>
+
+                {/* Validation Message */}
+                {formErrors.position && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formErrors.position}
+                  </p>
+                )}
               </div>
             </div>
-            <div>
-              <fieldset className="mt-4">
-                <legend className="sr-only">Position Options</legend>
-                <div className="space-y-4 sm:flex sm:items-center sm:space-x-10 sm:space-y-0">
-                  <div className="flex items-center">
-                    <input
-                      id="positionIntern"
-                      name="positionOptions"
-                      type="radio"
-                      value="Intern"
-                      className="h-4 w-4 border-slate-300 text-slate-600 focus:ring-slate-600 cursor-pointer"
-                      checked={form.level === "Intern"}
-                      onChange={(e) => updateForm({ level: e.target.value })}
-                    />
+            <div className="mt-6 sm:max-w-md">
+              <fieldset>
+                <legend className="block text-sm font-medium text-slate-900 mb-2">
+                  Position Level
+                </legend>
+                <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-4">
+                  {["Intern", "Junior", "Senior"].map((level) => (
                     <label
-                      htmlFor="positionIntern"
-                      className="ml-3 block text-sm font-medium leading-6 text-slate-900 mr-4"
+                      key={level}
+                      className={`flex items-center gap-2 px-3 py-2 border rounded-md cursor-pointer transition-all
+            ${
+              form.level === level
+                ? "border-indigo-600 bg-indigo-50 text-indigo-600"
+                : "border-slate-300 text-slate-700 hover:border-slate-400"
+            }`}
                     >
-                      Intern
+                      <input
+                        type="radio"
+                        name="positionLevel"
+                        value={level}
+                        checked={form.level === level}
+                        onChange={(e) => updateForm({ level: e.target.value })}
+                        className="accent-indigo-600"
+                      />
+                      {level}
                     </label>
-                    <input
-                      id="positionJunior"
-                      name="positionOptions"
-                      type="radio"
-                      value="Junior"
-                      className="h-4 w-4 border-slate-300 text-slate-600 focus:ring-slate-600 cursor-pointer"
-                      checked={form.level === "Junior"}
-                      onChange={(e) => updateForm({ level: e.target.value })}
-                    />
-                    <label
-                      htmlFor="positionJunior"
-                      className="ml-3 block text-sm font-medium leading-6 text-slate-900 mr-4"
-                    >
-                      Junior
-                    </label>
-                    <input
-                      id="positionSenior"
-                      name="positionOptions"
-                      type="radio"
-                      value="Senior"
-                      className="h-4 w-4 border-slate-300 text-slate-600 focus:ring-slate-600 cursor-pointer"
-                      checked={form.level === "Senior"}
-                      onChange={(e) => updateForm({ level: e.target.value })}
-                    />
-                    <label
-                      htmlFor="positionSenior"
-                      className="ml-3 block text-sm font-medium leading-6 text-slate-900 mr-4"
-                    >
-                      Senior
-                    </label>
-                  </div>
+                  ))}
                 </div>
+                {formErrors.level && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {formErrors.level}
+                  </p>
+                )}
               </fieldset>
             </div>
           </div>

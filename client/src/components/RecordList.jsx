@@ -16,14 +16,14 @@ const Record = (props) => (
     <td className="p-4 align-middle [&:has([role=checkbox])]:pr-0">
       <div className="flex gap-2">
         <Link
-          className="group inline-flex items-center gap-1 justify-center whitespace-nowrap text-sm font-medium text-white ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input border-blue-500 bg-blue-500 hover:bg-blue-700 h-9 rounded-md px-3"
+          className="group inline-flex items-center gap-1 justify-center whitespace-nowrap text-sm font-regular text-white ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input border-blue-500 bg-blue-500 hover:bg-blue-700 h-9 rounded-md px-3"
           to={`/edit/${props.record._id}`}
         >
           <FaEdit className="inline-block transition-transform duration-300 group-hover:scale-125 group-hover:rotate-6" />
           Edit
         </Link>
         <button
-          className="group inline-flex items-center gap-1 justify-center whitespace-nowrap text-sm font-medium text-white ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input border-red-600 bg-red-600 hover:bg-red-700 hover:text-accent-foreground h-9 rounded-md px-3"
+          className="group inline-flex items-center gap-1 justify-center whitespace-nowrap text-sm font-regular text-white ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input border-red-600 bg-red-600 hover:bg-red-700 hover:text-accent-foreground h-9 rounded-md px-3"
           color="red"
           type="button"
           onClick={() => {
@@ -42,6 +42,7 @@ export default function RecordList() {
   const [records, setRecords] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [levelFilter, setLevelFilter] = useState(""); // filter by level
+  const [sortOrder, setSortOrder] = useState("asc"); // sort order by asc or desc
 
   // This method fetches the records from the database.
   useEffect(() => {
@@ -88,6 +89,7 @@ export default function RecordList() {
           const levelFilterMatch =
             levelFilter === "" || record.level === levelFilter;
 
+          // Check if the record's name matches the search term
           const searchNameMatch = recordNameString
             .toLowerCase()
             .includes(searchTerm.toLowerCase());
@@ -98,6 +100,14 @@ export default function RecordList() {
 
           return searchMatch;
         })
+
+        .sort((a, b) => {
+          const nameA = a.name.toLowerCase();
+          const nameB = b.name.toLowerCase();
+          if (sortOrder === "asc") return nameA.localeCompare(nameB);
+          else return nameB.localeCompare(nameA);
+        })
+
         // Map the filtered records to a list of Record components
         .map((record) => (
           // Render a Record component for each record, passing the record data and a delete function as props
@@ -153,6 +163,30 @@ export default function RecordList() {
             {level === "" ? "All" : level}
           </button>
         ))}
+      </div>
+
+      <div className="flex items-center gap-2 mb-4">
+        <h4 className="text-sm font-medium text-gray-700">Sort by name:</h4>
+        <button
+          onClick={() => setSortOrder("asc")}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200 ${
+            sortOrder === "asc"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          Ascending
+        </button>
+        <button
+          onClick={() => setSortOrder("desc")}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors duration-200 ${
+            sortOrder === "desc"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+          }`}
+        >
+          Descending
+        </button>
       </div>
 
       {/* /// This div contains a table that displays the filtered records. */}
