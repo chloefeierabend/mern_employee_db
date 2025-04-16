@@ -10,6 +10,7 @@ export default function Record() {
   const [isNew, setIsNew] = useState(true);
   const params = useParams();
   const navigate = useNavigate();
+  const [formErrors, setFormErrors] = useState({});
 
   useEffect(() => {
     async function fetchData() {
@@ -38,15 +39,33 @@ export default function Record() {
 
   // These methods will update the state properties.
   function updateForm(value) {
-    return setForm((prev) => {
-      return { ...prev, ...value };
-    });
+    const key = Object.keys(value)[0];
+    setFormErrors((prevErrors) => ({ ...prevErrors, [key]: "" }));
+    return setForm((prev) => ({ ...prev, ...value }));
   }
+
+  const validationForm = () => {
+    const errors = {};
+    if (!form.name.trim()) errors.name = "Name is required.";
+    if (!form.position.trim()) errors.position = "Position is required.";
+    if (!form.level.trim()) errors.level = "Level is required.";
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   // This function will handle the submission.
   async function onSubmit(e) {
     e.preventDefault();
+
+    if (!validationForm()) return;
+
     const person = { ...form };
+    const errors = validationForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
     try {
       let response;
       if (isNew) {
@@ -112,7 +131,13 @@ export default function Record() {
                 Name
               </label>
               <div className="mt-2">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-slate-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
+                <div
+                  className={`flex rounded-md shadow-sm ring-1 ring-inset ${
+                    formErrors.name ? "ring-2 ring-red-500" : "ring-slate-300"
+                  } focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md`}
+                >
+                  {/* TODO: fix indigo focus ring to be around the wrapper and not the input */}
+
                   <input
                     type="text"
                     name="name"
@@ -122,6 +147,11 @@ export default function Record() {
                     value={form.name}
                     onChange={(e) => updateForm({ name: e.target.value })}
                   />
+                  {formErrors.name && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {formErrors.name}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

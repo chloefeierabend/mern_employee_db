@@ -36,11 +36,14 @@
 
 import { Outlet } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import HomePage from "./components/HomePage";
 
 const App = () => {
   return (
     <div className="w-full p-6">
       <Navbar />
+      {/* <HomePage /> */}
+      {/* TODO: FIX */}
       <Outlet />
     </div>
   );
